@@ -1,0 +1,25 @@
+{
+  "name": "autofan",
+  "version": "1.0.0",
+  "description": "\u001b[3~turn on my fan",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/exildev/autofan.git"
+  },
+  "keywords": [
+    "fan"
+  ],
+  "author": "EXILE",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/exildev/autofan/issues"
+  },
+  "homepage": "https://github.com/exildev/autofan#readme",
+  "dependencies": {
+    "johnny-five": "^0.9.59"
+  }
+}
