@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>AutoFan</title>
+		<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+	</head>
+	<body>
+
+		<video id = "video" autoplay="true" style="width: 680px; heigth: 320px;"></video>
+		<div id = "logger"></div>
+		<script type="text/javascript">
+		    var video = document.getElementById('video');
+		    var logger = document.getElementById('logger');
+		    var canvas = document.createElement('canvas');
+		    var context = canvas.getContext('2d');
+		    context.width = 120;
+		    context.height = 120;
+
+
+		    function log(message) {
+		       logger.innerHTML = logger.innerHTML + message + "<br/>";
+		    };
+
+		    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
+			 
+
+		    if(navigator.getUserMedia) {
+		        navigator.getUserMedia({video: true}, successCallback, errorCallback);
+
+		        function successCallback( stream ) {
+		        	log('Broadcasting...');
+		            video.src = window.URL.createObjectURL(stream);
+		        };
+
+		        function errorCallback( error ) {
+		            log('Error broadcasting: ' + error.code );
+		        };
+		    } else {
+		        log('Cannot access to the camera');
+		    };
+		</script>
+		<script type="text/javascript">
+			var socket = io('http://192.168.0.106:1199');
+			socket.on('fan-on', function(){
+				console.log("on");
+				document.getElementById("changer").checked = true;
+			});
+			socket.on('fan-off', function(){
+				console.log("off");
+				document.getElementById("changer").checked = false;
+			});
+			function fan_on() {
+				socket.emit('fan-on');
+			}
+			function fan_off() {
+				socket.emit('fan-off');
+			}
+			function change(value){
+				if (value){
+					fan_on();
+				}else{
+					fan_off();
+				}
+			}
+
+			/* SOCKET.IO */
+
+		    socket.on('connect', function () {
+		    	log('connected');
+		    });
+
+		    socket.on('disconnect', function () {
+		    	log('disconnected');
+		    });
+
+		    function emit(message) {
+		    	console.log(message);
+		    	socket.emit('data', message);
+		    }
+
+		    /* END SOCKET.IO */
+
+		    function sendFrame(video, context) {
+		        context.drawImage(video, 0, 0, context.width, context.height);
+		        emit(canvas.toDataURL('image/webp'));
+		        //socket.emit('data', 'ok');
+		    }
+
+		    setInterval(function() { sendFrame(video, context); }, 100);
+		</script>
+		<h1>AutoFan</h1>
+		<input id="changer" type="checkbox" onchange="change(this.checked);">
+		<label for="changer">LED</label>
+	</body>
+</html>
